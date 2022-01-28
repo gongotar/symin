@@ -42,6 +42,10 @@ do
     esac
 done
 
+if [[ $package_path != /* || $install_path != /* || $export_root != /* ]]; then
+    exit_abnormal "Please provide the absolute paths."    
+fi
+
 # infere the name, filename, and url from each other if required and possible
 
 if [[ -z $name && -z $filename && ! -z $url ]]; then    # get filename from url
