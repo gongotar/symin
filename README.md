@@ -1,7 +1,7 @@
-# syminst
+# Syminst
 Symlink Installer - A lightweight script to install / remove packages using symlink-style package management
 
-**syminst** is a leightweight package manager for linux in _bash_. The packages can be installed and removed locally under the *home* directory with a single command. 
+**Syminst** is a leightweight package manager for linux in _bash_. The packages can be installed and removed locally under the *home* directory with a single command. 
 
 ## Usage
 First, `init_syminst.sh` should be executed only once to create the initial directories. Then, for each package `syminst.sh` can be invoked to install/uninstall the packages. Here you find some sample usages:
