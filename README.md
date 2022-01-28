@@ -34,6 +34,7 @@ Packages are maintained in three directories:
     - As a result, the files are actually placed under `install_path/package_name`.
 4. Then, `syminst.sh` recursively creates symbolic links under `export_root/usr` pointing to all files that are installed under `install_path/package_name`. 
     - As a result, the installed files are visible in the exported paths to the `$PATH` and `$LD_LIBRARY_PATH` environment variables without actually being installed there. 
+    - The files find each other under `export_root/usr` as they expect.
     - The packages are keeped separated in different directories. 
 
 `syminst.sh` uninstalls a package `package_name` by removing the files in the `export_root/usr` that point to the `install_path/package_name`, and then removing the `install_path/package_name` itself.
