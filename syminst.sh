@@ -2,9 +2,9 @@
 
 # default values
 
-package_path=/home/bemghola/.apps/packages
-install_path=/home/bemghola/.apps/installs
-export_root=/home/bemghola/.apps/root
+package_path=/home/username/.apps/packages
+install_path=/home/username/.apps/installs
+export_root=/home/username/.apps/root
 cores=4
 
 
