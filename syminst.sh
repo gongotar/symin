@@ -45,6 +45,9 @@ done
 if [[ $package_path != /* || $install_path != /* || $export_root != /* ]]; then
     exit_abnormal "Please provide the absolute paths."    
 fi
+if [[ ! -d $package_path || ! -d $export_root || ! -d $install_path ]]; then
+    exit_abnormal "Please run init_syminst.sh first to create the necessary paths."
+fi
 
 # infere the name, filename, and url from each other if required and possible
 
@@ -88,7 +91,6 @@ if [ $uninstall == "false" ]; then
         exit_abnormal "Could not find directory $name under $package_path"
     fi
 
-    mkdir $install_path/$name
     pushd $name
 
     if [[ ! -f configure && -f autogen.sh ]]; then
@@ -117,6 +119,7 @@ if [ $uninstall == "false" ]; then
         exit_abnormal "Unsuccessful make!"
     fi
 
+    mkdir $install_path/$name
     make DESTDIR=$install_path/$name install
     status=$?
     if test ! $status -eq 0; then
