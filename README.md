@@ -17,6 +17,7 @@ If an URL is specified and the _filename_ exists at the end of the URL, `-f` or 
 
 If the _name_ of the unpacked archive exists in the _filename_ of the archive as `filename = name.extension`, where `extension` could be `tar.gz`, then, `syminst.sh` identifies the _name_ automatically. Otherwise, _name_ (and possibly _extension_ `-e`) should be given using `-n`.
 
+Notice that this script only supports installations that follow the common behavior of `./configure, make, make install`. If necessary, `autogen.sh` is performed before `./configure`.
 
 
 ## Package Management
