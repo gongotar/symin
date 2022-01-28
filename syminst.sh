@@ -5,7 +5,7 @@
 package_path=/home/bemghola/.apps/packages
 install_path=/home/bemghola/.apps/installs
 export_root=/home/bemghola/.apps/root
-cores=144
+cores=4
 
 
 ext="tar.gz"
