@@ -28,7 +28,7 @@ do
         i) install_path=${OPTARG};;
         j) cores=${OPTARG};;
         s) installer=${OPTARG};;
-        h) usage;;
+        h) usage; exit 0;;
     esac
 done
 

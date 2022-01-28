@@ -38,7 +38,7 @@ do
         r) export_root=${OPTARG};;
         i) install_path=${OPTARG};;
         j) cores=${OPTARG};;
-        h) usage;;
+        h) usage; exit 0;;
     esac
 done
 
