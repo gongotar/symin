@@ -49,7 +49,7 @@ if [[ ! -d $package_path || ! -d $export_root || ! -d $install_path ]]; then
     exit_abnormal "Please run init_syminst.sh first to create the necessary directories."
 fi
 
-# infere the name, filename, and url from each other if required and possible
+# infer the name, filename, and url from each other if required and possible
 
 if [[ -z $name && -z $filename && ! -z $url ]]; then    # get filename from url
     filename=`echo $url | rev | cut -d '/' -f1 | rev`
