@@ -11,33 +11,32 @@ syminst.sh -l https://ftp.gnu.org/gnu/bc/bc-1.07.tar.gz     # install from the U
 syminst.sh -f bc-1.07.tar.gz                                # install from the archive file (archive file should be available)
 syminst.sh -n bc-1.07                                       # install by the name (archive file should be available)
 ```
-If the _filename_ of the archive is not given (using `-f`), `syminst.sh` tries to infer the _filename_ from the given URL (using `-l`) or from the name (given by `-n`). If _filename_ is not given and could not be inferred, `syminst.sh` reports an error.
-
-If an URL is specified and the _filename_ exists at the end of the URL, `-f` or `-n` are not required. Otherwise, _filename_ should be given using `-f`.
-
-If the _name_ of the unpacked archive exists in the _filename_ of the archive as `filename = name.extension`, where `extension` could be `tar.gz`, then, `syminst.sh` identifies the _name_ automatically. Otherwise, _name_ (and possibly _extension_ `-e`) should be given using `-n`.
+- If the _filename_ of the archive is not given (using `-f`), `syminst.sh` tries to infer the _filename_ from the given URL (`-l`) or from the name (given by `-n`). - If _filename_ is not given and could not be inferred, `syminst.sh` reports an error.
+- If an URL is specified and the _filename_ exists at the end of the URL, `-f` or `-n` are not required. Otherwise, _filename_ should be given using `-f`.
+- If _filename_ is given (`-f`), and the _name_ of the unpacked archive exists in the _filename_ of the archive as _filename = name.extension_, where `extension` could be `tar.gz`, then, `syminst.sh` identifies the _name_ automatically. Otherwise, _name_ should be given using `-n`.
 
 Notice that this script only supports installations that follow the common behavior of `./configure, make, make install`. If necessary, `autogen.sh` is performed before `./configure`.
 
 
 ## Package Management
 
-Packages are maintained using three directories:
+Packages are maintained in three directories:
 - **package_path:** contains all the archive files of the packages in case they are needed in the future.
 - **export_root:** contains the directories that are exported in the `$PATH` and `$LD_LIBRARY_PATH` environment variables (in _.bashrc_).
   - The directories `<export_root>/usr/bin` and `<export_root>/usr/sbin` are exported to `$PATH`. 
   - The directories `<export_root>/usr/lib` and `<export_root>/usr/lib64` are exported to `$LD_LIBRARY_PATH`. 
-- **install_path:** the packages are installed here in separate directories for each package. Hence, they can be distinguished easily by their directory. But, these directories are not exported to the `$PATH` and `$LD_LIBRARY_PATH` environment variables.
+- **install_path:** the packages are installed here in separate directories for each package. Hence, they can be distinguished easily by their directories. Though, these directories are not exported to the `$PATH` and `$LD_LIBRARY_PATH` environment variables.
 
 `syminst.sh` performs the installation of a package `package_name`in _fakeroot_: 
 1. It configures the package to be installed under the `export_root/usr/` directory. 
-2. Though, `syminst.sh` redirects the installation (`make install`) to install the files under the `install_path/package_name` directory. 
+    - The package _thinks_ it is going to be installed under `export_root/usr/`.
+3. `syminst.sh` redirects the installation (`make install`) to install the files under the `install_path/package_name` directory instead. 
     - As a result, the files are actually placed under `install_path/package_name`.
-4. Then, `syminst.sh` creates symbolic links under `export_root/usr`, pointing to all files that are installed under `install_path/package_name`. 
+4. Then, `syminst.sh` recursively creates symbolic links under `export_root/usr` pointing to all files that are installed under `install_path/package_name`. 
     - As a result, the installed files are visible in the exported paths to the `$PATH` and `$LD_LIBRARY_PATH` environment variables without actually being installed there. 
     - The packages are keeped separated in different directories. 
 
-`syminst.sh` uninstalls a package `package_name` by removing the files in the `export_root/usr` that point to the `install_path/package_name`, and then removing the `install_path/package_name` it self.
+`syminst.sh` uninstalls a package `package_name` by removing the files in the `export_root/usr` that point to the `install_path/package_name`, and then removing the `install_path/package_name` itself.
 
 
 ## init_syminst.sh
