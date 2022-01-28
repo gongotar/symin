@@ -26,7 +26,7 @@ exit_abnormal() {                         # Function: Exit with error.
 
 # get terminal inputs
 
-while getopts ":ul:f:e:p:r:i:j:h:" flag
+while getopts ":ul:f:e:p:r:i:j:h" flag
 do
     case "${flag}" in
         u) uninstall="true";;

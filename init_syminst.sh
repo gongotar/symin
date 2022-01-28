@@ -20,7 +20,7 @@ exit_abnormal() {                         # Function: Exit with error.
 
 # get terminal inputs
 
-while getopts ":p:r:i:j:h:" flag
+while getopts ":p:r:i:j:h" flag
 do
     case "${flag}" in
         p) package_path=${OPTARG};;
