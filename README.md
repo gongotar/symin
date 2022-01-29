@@ -15,7 +15,7 @@ syminst.sh -n bc-1.07                                       # install by the nam
 - If an URL is specified and the _filename_ exists at the end of the URL, `-f` or `-n` are not required. Otherwise, _filename_ should be given using `-f`.
 - If _filename_ is given (`-f`), and the _name_ of the unpacked archive exists in the _filename_ of the archive as _filename = name.extension_, where `extension` could be `tar.gz`, then, `syminst.sh` identifies the _name_ automatically. Otherwise, _name_ should be given using `-n`.
 
-Notice that this script only supports installations that follow the common behavior of `./configure, make, make install`. If necessary, `autogen.sh` is performed before `./configure`.
+Notice that this script only supports installations that follow the common behavior of `./configure & make & make install`. If necessary, `autogen.sh` is performed before `./configure`.
 
 
 ## Package Management
