@@ -2,14 +2,15 @@
 
 # default values
 
-package_path=/home/username/.apps/packages
-install_path=/home/username/.apps/installs
-export_root=/home/username/.apps/root
+package_path=/home/bemghola/.apps/packages
+install_path=/home/bemghola/.apps/installs
+export_root=/home/bemghola/.apps/root
 cores=4
 
 
 ext="tar.gz"
 uninstall="false"
+config_param=""
 
 # define functions
 
@@ -26,13 +27,14 @@ exit_abnormal() {                         # Function: Exit with error.
 
 # get terminal inputs
 
-while getopts ":ul:f:e:p:r:i:j:h" flag
+while getopts ":ul:f:e:p:r:i:j:n:c:h" flag
 do
     case "${flag}" in
         u) uninstall="true";;
         l) url=${OPTARG};;
         n) name=${OPTARG};;
         f) filename=${OPTARG};;
+        c) config_param=${OPTARG};;
         e) ext=${OPTARG};;
         p) package_path=${OPTARG};;
         r) export_root=${OPTARG};;
@@ -51,7 +53,7 @@ fi
 
 # infer the name, filename, and url from each other if required and possible
 
-if [[ -z $name && -z $filename && ! -z $url ]]; then    # get filename from url
+if [[ -z $filename && ! -z $url ]]; then    # get filename from url
     filename=`echo $url | rev | cut -d '/' -f1 | rev`
 fi
 if [[ -z $name && ! -z $filename ]]; then   # get name from filename
@@ -103,13 +105,22 @@ if [ $uninstall == "false" ]; then
         fi
     fi
 
-    ./configure --prefix=$export_root/usr
-    status=$?
-    if test ! $status -eq 0; then
+    configured="false"
+    if [[ ! -f configure && ! -f Makefile ]]; then
         popd
         popd
-        exit_abnormal "Unsuccessful configure!"
+        exit_abnormal "Makefile and configure not found!"
+    elif [[ -f configure ]]; then
+        ./configure --prefix=$export_root/usr $config_param
+        status=$?
+        if test ! $status -eq 0; then
+            popd
+            popd
+            exit_abnormal "Unsuccessful configure!"
+        fi
+        configured="true"
     fi
+
 
     make -j$cores
     status=$?
@@ -128,7 +139,13 @@ if [ $uninstall == "false" ]; then
         exit_abnormal "Unsuccessful make install!"
     fi
 
-    cp -srv $install_path/"$name"$export_root/usr $export_root
+    
+    if [ $configured == "true" ]; then
+        cp -srv $install_path/"$name"$export_root/usr $export_root
+    else
+        cp -srv $install_path/$name/* $export_root/
+    fi
+
     popd
     rm -rf $name
     popd
