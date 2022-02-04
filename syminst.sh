@@ -15,7 +15,7 @@ config_param=""
 # define functions
 
 usage() {                                 # Function: Print a help message.
-    echo "Usage: $0 [ -f filename ] [ -n name ] [ -e extension ] [ -l URL ] [ -u ] [ -p package_path ] [ -r export_root ] [ -i install_path ] [ -j cores ]" 1>&2 
+    echo "Usage: $0 [ -f filename ] [ -n name ] [ -e extension ] [ -l URL ] [ -c configure_options ] [ -u ] [ -p package_path ] [ -r export_root ] [ -i install_path ] [ -j cores ]" 1>&2 
 }
 
 exit_abnormal() {                         # Function: Exit with error.
