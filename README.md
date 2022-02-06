@@ -1,7 +1,7 @@
 # Syminst
 Symlink Installer - A lightweight script to install / remove packages using symlink-style package management
 
-**Syminst** is a leightweight package manager for linux in _bash_. The packages can be installed and removed locally under the *home* directory with a single command. 
+**Syminst** is a leightweight package manager for installing packages from source code in Linux. The packages can be installed and removed locally under the *home* directory with a single command. 
 
 ## Usage
 First, `init_syminst.sh` should be executed only once to create the initial directories. Then, for each package `syminst.sh` can be invoked to install/uninstall the packages. Here you find some sample usages:
@@ -11,9 +11,6 @@ syminst.sh -l https://ftp.gnu.org/gnu/bc/bc-1.07.tar.gz     # install from the U
 syminst.sh -f bc-1.07.tar.gz                                # install from the archive file (archive file should be available)
 syminst.sh -n bc-1.07                                       # install by the name (archive file should be available)
 ```
-- If the _filename_ of the archive is not given (using `-f`), `syminst.sh` tries to infer the _filename_ from the given URL (`-l`) or from the name (given by `-n`). - If _filename_ is not given and could not be inferred, `syminst.sh` reports an error.
-- If an URL is specified and the _filename_ exists at the end of the URL, `-f` or `-n` are not required. Otherwise, _filename_ should be given using `-f`.
-- If _filename_ is given (`-f`), and the _name_ of the unpacked archive exists in the _filename_ of the archive as _filename = name.extension_, where `extension` could be `tar.gz`, then, `syminst.sh` identifies the _name_ automatically. Otherwise, _name_ should be given using `-n`.
 
 Notice that this script only supports installations that follow the common behavior of `./configure & make & make install`. If necessary, `autogen.sh` is performed before `./configure`.
 
@@ -65,3 +62,8 @@ All flags are optional, though, at the end, `syminst.sh` should be able to infer
 - `-r <export_root>`: depreciated usage (instead use `init_syminst.sh`). This directory is exported to the `$PATH` and `$LD_LIBRARY_PATH` environment variables.
 - `-i <install_path>`: depreciated usage (instead use `init_syminst.sh`). This directory contains the installed packages in separate directories each.
 - `-j <cores>`: depreciated usage (instead use `init_syminst.sh`). The number of cores for `make`.
+
+Guessing the package name and filename:
+- If the _filename_ of the archive is not given (using `-f`), `syminst.sh` tries to infer the _filename_ from the given URL (`-l`) or from the name (given by `-n`). - If _filename_ is not given and could not be inferred, `syminst.sh` reports an error.
+- If an URL is specified and the _filename_ exists at the end of the URL, `-f` or `-n` are not required. Otherwise, _filename_ should be given using `-f`.
+- If _filename_ is given (`-f`), and the _name_ of the unpacked archive exists in the _filename_ of the archive as _filename = name.extension_, where `extension` could be `tar.gz`, then, `syminst.sh` identifies the _name_ automatically. Otherwise, _name_ should be given using `-n`.
