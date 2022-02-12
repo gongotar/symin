@@ -53,13 +53,14 @@ All flags are optional and `init_syminst.sh` can be invoked without defining any
 
 ## syminst.sh
 
-`Usage: ./syminst.sh [ -f filename ] [ -n name ] [ -e extension ] [ -l URL ] [ -u ] [ -p package_path ] [ -r export_root ] [ -i install_path ] [ -j cores ]`
+`Usage: ./syminst.sh [ -f filename ] [ -n name ] [ -e extension ] [ -l URL ] [ -c configure_options ] [ -u ] [ -p package_path ] [ -r export_root ] [ -i install_path ] [ -j cores ]`
 
 All flags are optional, though, at the end, `syminst.sh` should be able to infer the filename of the archive.
 - `-f <filename>`: archive file name. If not specified, it is either defined as _name_+._extension_ (`-n <name>`, `-e <extension>`), or by the URL (`-l <URL>`).
 - `-n <name>`: the _name_ of the unpacked archive. If the _name_ and _filename_ follow the usuall pattern of _filename=name.extension_, specifying one of _name_ or _filename_ suffices.
 - `-e <extension>`: the extension of the archive file. the default is `tar.gz`. This is rarely needed when _filename_ cannot be inferred from other information.
 - `-l <URL>`: the URL to download the archive file. If the URL contains the archive name (_filename_) at its end, `syminst.sh` extracts the _filename_ if `-f` is not specified.
+- `-c <configure_options>:` extra parameters passed to the configure script.
 - `-u`: if this flag is specified, the defined package (using `-f` or `-n`) will be uninstalled. The default behavior if `-u` is not specified, is to install the package.
 - `-p <package_path>`: depreciated usage (instead use `init_syminst.sh`). It defines the package path to keep the archive files.
 - `-r <export_root>`: depreciated usage (instead use `init_syminst.sh`). This directory is exported to the `$PATH` and `$LD_LIBRARY_PATH` environment variables.
