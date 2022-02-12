@@ -50,7 +50,7 @@ if [[ $package_path != /* || $install_path != /* || $export_root != /* ]]; then
     exit_abnormal "Please provide the absolute paths."    
 fi
 
-mkdir -p $package_path $install_path $export_root
+mkdir -p $package_path $install_path $export_root/usr
 status=$?
 if test ! $status -eq 0; then
     exit_abnormal "Could not create the necessary directories. please check the permissions."
@@ -59,6 +59,10 @@ fi
 path_export="export PATH=\$PATH:$export_root/usr/bin:$export_root/usr/sbin"
 lib_export="export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:$export_root/usr/lib:$export_root/usr/lib64"
 pkgconfig_export="export PKG_CONFIG_PATH=\${PKG_CONFIG_PATH}:$export_root/usr/lib/pkgconfig:$export_root/usr/lib64/pkgconfig"
+
+if [ ! -f $HOME/.bashrc ]; then
+    touch $HOME/.bashrc
+fi
 
 if ! grep -q "$path_export" $HOME/.bashrc; then
     echo $path_export >> $HOME/.bashrc
