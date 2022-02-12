@@ -4,7 +4,7 @@ Symlink Installer - A lightweight script to install / remove packages using syml
 **Symin** is a leightweight package manager for installing packages from source code in Linux. The packages can be installed and removed locally under the *home* directory with a single command. 
 
 ## Usage
-First, execute `setup.sh` to create the initial directories and configure the library and binary paths. 
+First, execute `source setup.sh` to create the initial directories and configure the library and binary paths. 
 For installing/uninstalling a package, `symin` can be invoked as follows:
 ```sh
 symin -l https://ftp.gnu.org/gnu/bc/bc-1.07.tar.gz     # install from the URL (archive will be downloaded)
@@ -50,7 +50,7 @@ All flags are optional and `setup.sh` can be invoked without defining any flags 
 
 ## symin
 
-`Usage: ./symin [ -f filename ] [ -n name ] [ -e extension ] [ -l URL ] [ -c configure_options ] [ -u ] [ -p package_path ] [ -r export_root ] [ -i install_path ] [ -j cores ]`
+`Usage: symin [ -f filename ] [ -n name ] [ -e extension ] [ -l URL ] [ -c configure_options ] [ -u ] [ -p package_path ] [ -r export_root ] [ -i install_path ] [ -j cores ]`
 
 All flags are optional, though, at the end, `symin` should be able to infer the filename of the archive.
 - `-f <filename>`: archive file name. If not specified, it is either defined as _name_+._extension_ (`-n <name>`, `-e <extension>`), or by the URL (`-l <URL>`).

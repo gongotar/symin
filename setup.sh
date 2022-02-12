@@ -50,7 +50,7 @@ if [[ $package_path != /* || $install_path != /* || $export_root != /* ]]; then
     exit_abnormal "Please provide the absolute paths."    
 fi
 
-mkdir -p $package_path $install_path $export_root/usr
+mkdir -p $package_path $install_path $export_root/usr/bin
 status=$?
 if test ! $status -eq 0; then
     exit_abnormal "Could not create the necessary directories. please check the permissions."
@@ -74,7 +74,7 @@ if ! grep -q "$pkgconfig_export" $HOME/.bashrc; then
     echo $pkgconfig_export >> $HOME/.bashrc
 fi
 
-$installer_new_path=$export_root/usr/bin/
+installer_new_path=$export_root/usr/bin/symin
 
 cp $installer $installer_new_path
 
