@@ -65,20 +65,10 @@ if [[ ! -d $package_path || ! -d $export_root || ! -d $install_path ]]; then
     exit_abnormal "Please run init_syminst.sh first to create the necessary directories."
 fi
 
-# infer the name, filename, and url from each other if required and possible
+# infer the filename from the url or the name
 
 if [[ -z $filename && ! -z $url ]]; then    # get filename from url
     filename=`echo $url | rev | cut -d '/' -f1 | rev`
-fi
-if [[ -z $name && ! -z $filename ]]; then   # get name from filename
-    fext=${filename:${#filename}-${#ext}:${#filename}}
-    case $fext in 
-        tar.gz|tar.bz|tar.xz|$ext) 
-            ext=$fext;;
-        *) 
-            exit_abnormal "Unknown extension $fext of file $filenamme. Try setting the file extension using the flag -e";;
-    esac
-    name=${filename:0:${#filename}-${#ext}-1}
 elif [[ -z $filename && ! -z $name ]]; then     # get filename from name
     filename="$name"."$ext"
 elif [[ -z $name && -z $filename ]]; then
@@ -94,6 +84,7 @@ if [ $uninstall == "false" ]; then
     if [ ! -z "$url" ]; then
         wget $url
     fi
+    name=`tar -tf $filename | head -1 | cut -f1 -d'/'`
 
     if [ ! -f $filenamme]; then
         popd
@@ -169,6 +160,9 @@ if [ $uninstall == "false" ]; then
 
 elif [ $uninstall == "true" ]; then
 
+    if [[ -z $name && ! -z $filename ]]; then
+        name=`tar -tf $filename | head -1 | cut -f1 -d'/'`
+    fi
     find $export_root -lname "$install_path/$name*" -delete
     rm -rf $install_path/$name
 #    pushd $package_path
