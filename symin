@@ -29,7 +29,15 @@ config_params=""
 # define functions
 
 usage() {                                 # Function: Print a help message.
-    echo "Usage: $0 [ -f filename ] [ -n name ] [ -e extension ] [ -l URL ] [ -c configure_options ] [ -u ] [ -p package_path ] [ -r export_root ] [ -i install_path ] [ -j cores ]" 1>&2 
+    echo "Usage: $0" 1>&2 
+    echo "          [ --operation=<install | uninstall | hide | unhide> ]   # operation to be performed" 1>&2
+    echo "          [ --url=<download url> ]                                # package download URL" 1>&2
+    echo "          [ --file=<tar archive> ]                                # package archive file name" 1>&2
+    echo "          [ --cores=<number of cores> ]                           # number of cores to use for build" 1>&2
+    echo "          [ --config-params=<configure parameters> ]              # parameters to be passed to ./configure" 1>&2
+    echo "          [ --executable=<program executable> ]                   # an executable to specify a program for uninstall or hide" 1>&2
+    echo "          [ --qualified-name=<program qualified name> ]           # a unique name to specify a program for uninstall, hide, or unhide" 1>&2
+    echo "          [ --help | -h ]                                         # prints this help message" 1>&2
 }
 
 exit_abnormal() {                         # Function: Exit with error.
@@ -111,7 +119,8 @@ if [[ $operation == "install" ]]; then
 
     # infer the filename from the url
     if [[ -z $file && ! -z $url ]]; then
-        file=`echo $url | rev | cut -d '/' -f1 | rev`
+        #file=`echo $url | rev | cut -d '/' -f1 | rev`
+        file=`basename $url`
     elif [[ -z $file && -z $url ]]; then
         exit_abnormal "Please provide a filename or a URL to fetch the source code!"
     fi
