@@ -25,7 +25,7 @@ Notice that **symin** only supports GNU build system installations (`./configure
 
 `Usage: source setup.sh [ -p package_path ] [ -r export_root ] [ -i install_path ] [ -j cores ] [ -s installer_path ]`
 
-All flags are optional and `setup.sh` can be invoked without defining any flags (default values are enough). Following flags can be adjusted according to more specific usages:
+You are good to go with the defaults and just performing `source setup.sh`. All flags are optional and `setup.sh` can be invoked without defining any flags. In the case of having specific requirements, please first refer to the section *Package Management* bellow to understand the setup parameters. The following flags can be adjusted to match with more specific usages. 
 - `-p <package_path>`: defines the package path to keep the archive files.
 - `-r <export_root>`: the directory that is exported to the `$PATH` and `$LD_LIBRARY_PATH` environment variables.
 - `-i <install_path>`: the directory containing the installed packages in separate directories each.
