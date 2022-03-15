@@ -20,7 +20,7 @@ Notice that **symin** only supports GNU build system installations (`./configure
 
 ## setup.sh
 
-`Usage: setup.sh [ -p package_path ] [ -r export_root ] [ -i install_path ] [ -j cores ] [ -s installer_path ]`
+`Usage: source setup.sh [ -p package_path ] [ -r export_root ] [ -i install_path ] [ -j cores ] [ -s installer_path ]`
 
 All flags are optional and `setup.sh` can be invoked without defining any flags (default values are enough). Following flags can be adjusted according to more specific usages:
 - `-p <package_path>`: defines the package path to keep the archive files.
