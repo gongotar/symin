@@ -8,7 +8,7 @@ The operations do not need root privileges and are performed locally under the *
 
 ## Usage Samples
 First, execute `source setup.sh` to create the initial directories and configure the library and binary paths. 
-For installing/uninstalling a package, `symin` can be invoked as follows:
+Here you find some sample usages of `symin` to install, uninstall, hide, and unhide packages:
 ```bash
 symin --url=https://ftp.gnu.org/gnu/bc/bc-1.07.tar.gz               # install from the URL (archive will be downloaded)
 symin --file=bc-1.07.tar.gz                                         # install from the archive file (archive file should be available)
