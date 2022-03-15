@@ -47,14 +47,14 @@ Usage: symin
  ```
 
 Supported *operations* are:
-- **install:** (default) installs a package.
+- **install** (default): installs a package.
   - to install a package, one of the following parameters must be set:
     - *url*: the URL to download the package.
     - *file*: the archive file of the package (locally available).
   - optional parameters to install a package are as follows:
     - *config-params* *(optional)*: parameters that to be passed to the `./configure` script.
     - *cores* *(optional)*: number of cores available to build the package (`make -j<cores>`).
-- **uninstall:**: uninstalls a package. To specify a package to be uninstalled, one of the following parameters must be set:
+- **uninstall:** uninstalls a package. To specify a package to be uninstalled, one of the following parameters must be set:
   - *executable*: an executable of the program to be uninstalled. The program is determined from the executable.
   - *qualified-name*: a unique name that specifies the program. This is usually the name of the main folder after extracting the archive file. Usually it is consisted of the program name followed by its version. This is also the folder name where the program is installed to (under `<install_path>`, see below). Hence, calling `ls <install_path>` delivers the list of the qualified names of all programs installed by **symin**. For more information, see the section *Package Management*.
 - **hide:** makes a package (that is already installed) unavailable without actually uninstalling it. This operation hides the package on the system while it is still there safely. **symin** does not touch the package installation and only removes its symlinks (which can be recreated using *unhide*). This can be useful for some testing/expertimenting scenarios with the packages. To specify a package for hiding, one of the parameters *executable* or *qualified-name* must be set (see the discussion under the *uninstall* operation).
