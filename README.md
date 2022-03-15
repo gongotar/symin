@@ -6,7 +6,7 @@ The operations do not need root privileges and are performed locally under the *
 
 **symin** is kept leightweight to make it available on most systems with minimum dependencies. 
 
-## Usage
+## Usage Samples
 First, execute `source setup.sh` to create the initial directories and configure the library and binary paths. 
 For installing/uninstalling a package, `symin` can be invoked as follows:
 ```bash
@@ -18,7 +18,7 @@ symin --file=gnuplot-5.4.2.tar.gz --config-params="--with-cairo"    # install fr
 Notice that **symin** only supports GNU build system installations (`./configure & make & make install`) with the optional configure command. If necessary, `autogen.sh` is performed before `./configure`.
 
 
-## setup.sh
+## Setup
 
 `Usage: source setup.sh [ -p package_path ] [ -r export_root ] [ -i install_path ] [ -j cores ] [ -s installer_path ]`
 
@@ -29,7 +29,7 @@ All flags are optional and `setup.sh` can be invoked without defining any flags 
 - `-j <cores>`: the number of cores for `make`. This is automatically detected if not specified.
 - `-s <installer_path>`: the path to the `symin` script.
 
-## symin
+## Manual
 
 ```bash
 Usage: symin
