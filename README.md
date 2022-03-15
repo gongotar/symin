@@ -13,6 +13,9 @@ For installing/uninstalling a package, `symin` can be invoked as follows:
 symin --url=https://ftp.gnu.org/gnu/bc/bc-1.07.tar.gz               # install from the URL (archive will be downloaded)
 symin --file=bc-1.07.tar.gz                                         # install from the archive file (archive file should be available)
 symin --file=gnuplot-5.4.2.tar.gz --config-params="--with-cairo"    # install from the archive and setting the configure parameters
+symin --operation=uninstall --executable=gnuplot                    # uninstall the gnuplot program (program identified by its executable)
+symin --operation=hide --executable=python3                         # hides python3 without actually uninstalling it (the whole python installation identified by its python3 executable)
+symin --operation=unhide --qualified-name=gnuplot-5.4.2             # undo hide a hidden application by its qualified name  
 ```
 
 Notice that **symin** only supports GNU build system installations (`./configure & make & make install`) with the optional configure command. If necessary, `autogen.sh` is performed before `./configure`.
@@ -44,7 +47,7 @@ Usage: symin
  ```
 
 Supported *operations* are:
-- **install:** installs a package.
+- **install:** (default) installs a package.
   - to install a package, one of the following parameters must be set:
     - *url*: the URL to download the package.
     - *file*: the archive file of the package (locally available).
