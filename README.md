@@ -1,5 +1,5 @@
 # symin
-Symlink Installer - A lightweight package manager for installations from sources on UNIX systems. 
+Symlink installer - a lightweight package manager for installations from sources on UNIX systems. 
 
 **symin** performs different operations on packages, such as *install*, *uninstall*, *hide*, and *unhide* packages using symlink-style package management.
 The operations do not need the root privileges and are performed locally under the *home* directory with a single command. 
