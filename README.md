@@ -13,9 +13,9 @@ Here you find some sample usages of `symin` to install, uninstall, hide (making 
 symin --url=https://ftp.gnu.org/gnu/bc/bc-1.07.tar.gz               # install from the URL (archive will be downloaded)
 symin --file=bc-1.07.tar.gz                                         # install from the archive file (archive file should be available)
 symin --file=gnuplot-5.4.2.tar.gz --config-params="--with-cairo"    # install from the archive and setting the configure parameters
-symin --operation=uninstall --executable=gnuplot                    # uninstall the gnuplot program (program identified by its executable)
-symin --operation=hide --executable=python3                         # hides python3 without actually uninstalling it (the whole python installation identified by its python3 executable)
-symin --operation=unhide --qualified-name=gnuplot-5.4.2             # undo hide a hidden application by its qualified name  
+symin --uninstall --executable=gnuplot                              # uninstall the gnuplot program (program identified by its executable)
+symin --hide --name=python                                          # hides python3 without actually uninstalling it
+symin --unhide --name=python                                        # undo hide a hidden application by its qualified name  
 ```
 
 Notice that **symin** only supports GNU build system installations (`./configure & make & make install`) with the optional configure command. If necessary, `autogen.sh` is performed before `./configure`.
@@ -36,30 +36,69 @@ You are good to go with the defaults and just performing `source setup.sh`. All 
 
 ```bash
 Usage: symin
-          [ --operation=<install | uninstall | hide | unhide> ]   # operation to be performed
-          [ --url=<download url> ]                                # package download URL
-          [ --file=<tar archive> ]                                # package archive file name
-          [ --cores=<number of cores> ]                           # number of cores to use for build
-          [ --config-params=<configure parameters> ]              # parameters to be passed to ./configure
-          [ --executable=<program executable> ]                   # an executable to specify a program for uninstall or hide
-          [ --qualified-name=<program qualified name> ]           # a unique name to specify a program for uninstall, hide, or unhide
-          [ --help | -h ]                                         # prints this help message
+          [ --install ]                               # installs the specified package (default behavior)
+          [ --uninstall ]                             # uninstalls the specified package
+          [ --hide ]                                  # hides the specified package as if it is not installed
+          [ --unhide ]                                # undo hides the specified package
+          [ --url=<download url> ]                    # package download URL
+          [ --file=<tar archive> ]                    # package archive file name
+          [ --cores=<number of cores> ]               # number of cores to use for build
+          [ --config-params=<configure parameters> ]  # parameters to be passed to ./configure
+          [ --name=<package name> ]                   # the name of the package (or a part of its name)
+          [ --executable=<program executable> ]       # an executable to specify a program for uninstall or hide
+          [ --help | -h ]                             # prints this help message
  ```
 
 Supported *operations* are:
-- **install** (default): installs a package.
-  - to install a package, one of the following parameters must be set:
-    - *url*: the URL to download the package.
-    - *file*: the archive file of the package (locally available).
-  - optional parameters to install a package are as follows:
-    - *config-params* *(optional)*: parameters that to be passed to the `./configure` script.
+<table>
+<tr> 
+<td>
+                    
+**install** (default): 
+installs a package.<br>
+  - to install a package, one of the following parameters must be set:<br>
+    - *url*: the URL to download the package.<br>
+    - *file*: the archive file of the package (locally available).<br>
+  - optional parameters to install a package are as follows:<br>
+    - *config-params* *(optional)*: parameters that to be passed to the `./configure` script.<br>
     - *cores* *(optional)*: number of cores available to build the package (`make -j<cores>`).
-- **uninstall:** uninstalls a package. To specify a package to be uninstalled, one of the following parameters must be set:
+              
+</td>
+</tr>
+<tr>
+<td>
+
+**uninstall:** 
+uninstalls a package. To specify a package to be uninstalled, one of the following parameters must be set:
   - *executable*: an executable of the program to be uninstalled. The program is determined from the executable.
-  - *qualified-name*: a unique name that specifies the program. This is usually the name of the main folder after extracting the archive file. Usually it is consisted of the program name followed by its version. This is also the folder name where the program is installed to (under `<install_path>`, see below). Hence, calling `ls <install_path>` delivers the list of the qualified names of all programs installed by **symin**. For more information, see the section *Package Management*.
-- **hide:** makes a package (that is already installed) unavailable as if it's not installed, without actually uninstalling it. This operation hides the package on the system while it is still there safely. **symin** does not touch the package installation and only removes its symlinks (which can be recreated using *unhide*). This can be useful for some testing/expertimenting scenarios with the packages. To specify a package for hiding, one of the parameters *executable* or *qualified-name* must be set (see the discussion under the *uninstall* operation).
-  - after hiding a package, the *qualified-name* of the package will be reported. Use the *qualified-name* later when unhiding the package.
-- **unhide:** undo hides a hidden package to be available again on the system. To specify a hidden package, its *qualified-name* must be given. This is reported  at the time the package was made hidden.
+  - *name*: the name or a part of the name of the package to specify the target package. If more than one packages match with the name, the user will choose between the matching candidates.
+          
+</td>
+</tr>
+<tr> 
+<td>
+                    
+**hide:**
+makes a package (that is already installed) unavailable as if it's not installed, without actually uninstalling it. 
+          
+  - This operation hides the package on the system while it is still there safely. 
+  - **symin** does not touch the package installation and only removes its symlinks (which can be recreated using *unhide*). 
+  - This can be useful for some testing/expertimenting scenarios with the packages. 
+  - To specify a package for hiding, one of the parameters *executable* or *name* must be set (see the discussion under the *uninstall* operation).
+                    
+</td>
+</tr>
+<tr>
+<td>
+                    
+**unhide:** 
+undo hides a hidden package to be available again on the system. 
+  - To specify a hidden package, its *name* must be given. 
+  - If more than one packages match with the name, the user will choose between the matching candidates. 
+                    
+</td>
+</tr>
+</table>
 
 ## Package Management
 
