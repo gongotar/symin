@@ -40,7 +40,7 @@ usage() {                                 # Function: Print a help message.
     echo "          [ --config-params=<configure parameters> ]  # parameters to be passed to ./configure" 1>&2
     echo "          [ --name=<package name> ]                   # the name of the package (or a part of its name)" 1>&2
     echo "          [ --executable=<program executable> ]       # an executable to specify a program for uninstall or hide" 1>&2
-    echo "          [ --help | -h ]                                         # prints this help message" 1>&2
+    echo "          [ --help | -h ]                             # prints this help message" 1>&2
 }
 
 exit_abnormal() {                         # Function: Exit with error.
