@@ -14,7 +14,7 @@
 
 #!/bin/bash
 
-
+# find /home/bemghola/.apps/installs/*g* -maxdepth 0 -execdir basename '{}' ';' | nl
 
 # default values
 
@@ -30,13 +30,16 @@ config_params=""
 
 usage() {                                 # Function: Print a help message.
     echo "Usage: $0" 1>&2 
-    echo "          [ --operation=<install | uninstall | hide | unhide> ]   # operation to be performed" 1>&2
-    echo "          [ --url=<download url> ]                                # package download URL" 1>&2
-    echo "          [ --file=<tar archive> ]                                # package archive file name" 1>&2
-    echo "          [ --cores=<number of cores> ]                           # number of cores to use for build" 1>&2
-    echo "          [ --config-params=<configure parameters> ]              # parameters to be passed to ./configure" 1>&2
-    echo "          [ --executable=<program executable> ]                   # an executable to specify a program for uninstall or hide" 1>&2
-    echo "          [ --qualified-name=<program qualified name> ]           # a unique name to specify a program for uninstall, hide, or unhide" 1>&2
+    echo "          [ --install ]                               # installs the specified package (default behavior)" 1>&2
+    echo "          [ --uninstall ]                             # uninstalls the specified package" 1>&2
+    echo "          [ --hide ]                                  # hides the specified package as if it is not installed" 1>&2
+    echo "          [ --unhide ]                                # undo hides the specified package" 1>&2
+    echo "          [ --url=<download url> ]                    # package download URL" 1>&2
+    echo "          [ --file=<tar archive> ]                    # package archive file name" 1>&2
+    echo "          [ --cores=<number of cores> ]               # number of cores to use for build" 1>&2
+    echo "          [ --config-params=<configure parameters> ]  # parameters to be passed to ./configure" 1>&2
+    echo "          [ --name=<package name> ]                   # the name of the package (or a part of its name)" 1>&2
+    echo "          [ --executable=<program executable> ]       # an executable to specify a program for uninstall or hide" 1>&2
     echo "          [ --help | -h ]                                         # prints this help message" 1>&2
 }
 
@@ -49,33 +52,73 @@ exit_abnormal() {                         # Function: Exit with error.
 }
 
 get_qualified_name() {
-    if [[ -z $qualified_name ]]; then
-        if [[ ! -z $file && -f $file ]]; then
-            qualified_name=`tar -tf $file | head -1 | cut -f1 -d'/'`
-        elif [[ ! -z $executable ]]; then
-            symlink_name=`readlink $(which $executable)`
-            install_len=${#install_path}
-            path_base=${symlink_name:0:$install_len}
-            if [[ $path_base != $install_path ]]; then
-                exit_abnormal "The install directory $path_base is not the same directory of the symin installation path $install_path."
+    
+
+    if [[ ! -z $executable ]]; then                   # get the qualified name from the program executable (for uninstall and hide)
+
+        symlink_name=`readlink $(which $executable)`
+        install_len=${#install_path}
+        path_base=${symlink_name:0:$install_len}
+        if [[ $path_base != $install_path ]]; then
+            exit_abnormal "The install directory $path_base is not the same directory of the symin installation path $install_path."
+        fi
+        path_rest=${symlink_name:$install_len+1}
+        qualified_name=`echo $path_rest | cut -f1 -d'/'`
+
+    else                                                # get the qualified name from the user (for uninstall, hide, and unhide)
+
+        candidates_number=`find $install_path/*$name* -maxdepth 0 | wc -l`
+        chosen_number=-1
+
+        if [[ $candidates_number -gt 1 ]]; then
+
+            echo "Following installations are found:"
+            find $install_path/*$name* -maxdepth 0 -execdir basename '{}' ';' | nl
+            read -p "Enter the number of the package: " chosen_number
+
+        elif [[ $candidates_number -eq 1 ]]; then
+
+            echo "Following installation is found:"
+            find $install_path/*$name* -maxdepth 0 -execdir bash -c "printf '\t'; basename '{}'" ';'
+            read -p "Did you mean this package? (Y|n): " y_n
+            if [[ $y_n == "Y" || $y_n == "y" ]]; then
+                chosen_number=1
+            else
+                echo "Operation aborted!"
+                exit 0
             fi
-            path_rest=${symlink_name:$install_len+1}
-            qualified_name=`echo $path_rest | cut -f1 -d'/'`
+
         else
-            exit_abnormal "Please provide a qualified name, a tar file, or an executable name of the package"
+            exit_abnormal "Could not find any packages regarding the input name!"
         fi
+
+        if [[ $chosen_number -lt 1 ]]; then
+            exit_abnormal "Invalid choice!"
+        fi
+
+        qualified_name=`find $install_path/*$name* -maxdepth 0 -execdir basename '{}' ';' | sed -n "$chosen_number p"`
+
+    fi
 	
-        if [[ -z $qualified_name ]]; then
-            exit_abnormal "Could not specify the qualified name!"
-        fi
+    if [[ -z $qualified_name ]]; then
+        exit_abnormal "Could not specify the qualified name!"
     fi
 }
 
 # get terminal inputs
 while [ $# -gt 0 ]; do
     case "$1" in
-    --operation=*)
-        operation="${1#*=}"
+    --install)
+        operation="install"
+        ;;
+    --uninstall)
+        operation="uninstall"
+        ;;
+    --hide)
+        operation="hide"
+        ;;
+    --unhide)
+        operation="unhide"
         ;;
     --url=*)
         url="${1#*=}"
@@ -89,11 +132,11 @@ while [ $# -gt 0 ]; do
     --config-params=*|--config-params=*)
         config_params="${1#*=}"
         ;;
+    --name=*)
+        name="${1#*=}"
+        ;;
     --executable=*)
         executable="${1#*=}"
-        ;;
-    --qualified-name=*)
-        qualified_name="${1#*=}"
         ;;
     --help|-h)
         usage
@@ -207,9 +250,7 @@ elif [[ $operation == "hide" ]]; then
 
 elif [[ $operation == "unhide" ]]; then
 
-    if [[ -z $qualified_name ]]; then
-        exit_abnormal "Please provide the qualified name of the package!"
-    fi
+    get_qualified_name
     if [[ -d $install_path/"$qualified_name"$export_root/usr ]]; then   # configured install was performed
         cp -srv $install_path/"$qualified_name"$export_root/usr $export_root 
     elif [[ -d $install_path/"$qualified_name" ]]; then
