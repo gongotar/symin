@@ -246,7 +246,7 @@ elif [[ $operation == "hide" ]]; then
     get_qualified_name
     echo "clearing "$export_root " from symlinks to "$install_path/$qualified_name
     find $export_root -lname "$install_path/$qualified_name*" -delete
-    echo "Package with the qualified name \"$qualified_name\" has been hidden! To unhide the package use this qualified name"
+    echo "The package \"$qualified_name\" has been hidden!"
 
 elif [[ $operation == "unhide" ]]; then
 
