@@ -49,7 +49,7 @@ Usage: symin
           [ --help | -h ]                             # prints this help message
  ```
 
-Supported *operations* are:
+Supported operations are:
 <table>
 <tr> 
 <td>
