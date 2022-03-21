@@ -14,21 +14,22 @@
 
 #!/bin/bash
 
-# find /home/bemghola/.apps/installs/*g* -maxdepth 0 -execdir basename '{}' ';' | nl
 
-# default values
+# variables to be configured at setup
 
 package_path=/home/username/.apps/packages
 install_path=/home/username/.apps/installs
 export_root=/home/username/.apps/root
 cores=4
 
-operation="install"
-config_params=""
+# init default variables
+
+operation="install" 		# the default operation is to install the package
+config_params=""		# no configure parameters by default other than "--prefix" that is used for package management.
 
 # define functions
 
-usage() {                                 # Function: Print a help message.
+usage() {                             	# Function: Print a help message.
     echo "Usage: $0" 1>&2 
     echo "          [ --install ]                               # installs the specified package (default behavior)" 1>&2
     echo "          [ --uninstall ]                             # uninstalls the specified package" 1>&2
@@ -43,7 +44,7 @@ usage() {                                 # Function: Print a help message.
     echo "          [ --help | -h ]                             # prints this help message" 1>&2
 }
 
-exit_abnormal() {                         # Function: Exit with error.
+exit_abnormal() {                     	# Function: Exit with error.
     dirs -c
     echo "Error:" 1>&2
     echo $1 1>&2
@@ -51,10 +52,10 @@ exit_abnormal() {                         # Function: Exit with error.
     exit 1
 }
 
-get_qualified_name() {
+get_qualified_name() {			# Function: get the qualified name, either by following the executable symlink, or by prompting the user
     
 
-    if [[ ! -z $executable ]]; then                   # get the qualified name from the program executable (for uninstall and hide)
+    if [[ ! -z $executable ]]; then     # get the qualified name by following the program executable symlink (for uninstall and hide)
 
         symlink_name=`readlink $(which $executable)`
         install_len=${#install_path}
@@ -65,7 +66,7 @@ get_qualified_name() {
         path_rest=${symlink_name:$install_len+1}
         qualified_name=`echo $path_rest | cut -f1 -d'/'`
 
-    else                                                # get the qualified name from the user (for uninstall, hide, and unhide)
+    else                                # get the qualified name from the user (for uninstall, hide, and unhide)
 
         candidates_number=`find $install_path/*$name* -maxdepth 0 | wc -l`
         chosen_number=-1
@@ -106,6 +107,7 @@ get_qualified_name() {
 }
 
 # get terminal inputs
+
 while [ $# -gt 0 ]; do
     case "$1" in
     --install)
@@ -148,6 +150,8 @@ while [ $# -gt 0 ]; do
     shift
 done
 
+# check the package management paths to exist and be valid
+
 if [[ $package_path != /* || $install_path != /* || $export_root != /* ]]; then
     exit_abnormal "Please provide the absolute paths."    
 fi
@@ -155,6 +159,7 @@ if [[ ! -d $package_path || ! -d $export_root || ! -d $install_path ]]; then
     exit_abnormal "Please run setup.sh first to create the necessary directories."
 fi
 
+# perform one of the operations "install", "uninstall", "hide", "unhide" as specified by the user
 
 if [[ $operation == "install" ]]; then
 
