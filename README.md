@@ -6,7 +6,7 @@ The operations do not need the root privileges and are performed locally under t
 
 **symin** is kept leightweight to make it available on most systems with minimum dependencies. 
 
-## Usage Samples
+## Sample Usages
 First, execute `source setup.sh` to create the initial directories and configure the library and binary paths. 
 Here you find some sample usages of `symin` to install, uninstall, hide (making the package temporarily unavailable to the system without uninstalling/destroying it), and unhide packages:
 ```bash
