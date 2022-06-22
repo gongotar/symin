@@ -14,113 +14,198 @@
 
 #!/bin/bash
 
-# default values
+
+# variables to be configured at setup
 
 package_path=/home/username/.apps/packages
 install_path=/home/username/.apps/installs
 export_root=/home/username/.apps/root
 cores=4
 
+# init default variables
 
-ext="tar.gz"
-uninstall="false"
-config_param=""
+operation="install" 		# the default operation is to install the package
+config_params=""		# no configure parameters by default other than "--prefix" that is used for package management.
 
 # define functions
 
-usage() {                                 # Function: Print a help message.
-    echo "Usage: $0 [ -f filename ] [ -n name ] [ -e extension ] [ -l URL ] [ -c configure_options ] [ -u ] [ -p package_path ] [ -r export_root ] [ -i install_path ] [ -j cores ]" 1>&2 
+usage() {                             	# Function: Print a help message.
+    echo "Usage: $0" 1>&2 
+    echo "          [ --install ]                               # installs the specified package (default behavior)" 1>&2
+    echo "          [ --uninstall ]                             # uninstalls the specified package" 1>&2
+    echo "          [ --hide ]                                  # hides the specified package as if it is not installed" 1>&2
+    echo "          [ --unhide ]                                # undo hides the specified package" 1>&2
+    echo "          [ --url=<download url> ]                    # package download URL" 1>&2
+    echo "          [ --file=<tar archive> ]                    # package archive file name" 1>&2
+    echo "          [ --cores=<number of cores> ]               # number of cores to use for build" 1>&2
+    echo "          [ --config-params=<configure parameters> ]  # parameters to be passed to ./configure" 1>&2
+    echo "          [ --name=<package name> ]                   # the name of the package (or a part of its name)" 1>&2
+    echo "          [ --executable=<program executable> ]       # an executable to specify a program for uninstall or hide" 1>&2
+    echo "          [ --help | -h ]                             # prints this help message" 1>&2
 }
 
-exit_abnormal() {                         # Function: Exit with error.
+exit_abnormal() {                     	# Function: Exit with error.
+    dirs -c
     echo "Error:" 1>&2
     echo $1 1>&2
     usage
     exit 1
 }
 
+get_qualified_name() {			# Function: get the qualified name, either by following the executable symlink, or by prompting the user
+    
+
+    if [[ ! -z $executable ]]; then     # get the qualified name by following the program executable symlink (for uninstall and hide)
+
+        symlink_name=`readlink $(which $executable)`
+        install_len=${#install_path}
+        path_base=${symlink_name:0:$install_len}
+        if [[ $path_base != $install_path ]]; then
+            exit_abnormal "The install directory $path_base is not the same directory of the symin installation path $install_path."
+        fi
+        path_rest=${symlink_name:$install_len+1}
+        qualified_name=`echo $path_rest | cut -f1 -d'/'`
+
+    else                                # get the qualified name from the user (for uninstall, hide, and unhide)
+
+        candidates_number=`find $install_path/*$name* -maxdepth 0 | wc -l`
+        chosen_number=-1
+
+        if [[ $candidates_number -gt 1 ]]; then
+
+            echo "Following installations are found:"
+            find $install_path/*$name* -maxdepth 0 -execdir basename '{}' ';' | nl
+            read -p "Enter the number of the package: " chosen_number
+
+        elif [[ $candidates_number -eq 1 ]]; then
+
+            echo "Following installation is found:"
+            find $install_path/*$name* -maxdepth 0 -execdir bash -c "printf '\t'; basename '{}'" ';'
+            read -p "Did you mean this package? (Y|n): " y_n
+            if [[ $y_n == "Y" || $y_n == "y" ]]; then
+                chosen_number=1
+            else
+                echo "Operation aborted!"
+                exit 0
+            fi
+
+        else
+            exit_abnormal "Could not find any packages regarding the input name!"
+        fi
+
+        if [[ $chosen_number -lt 1 ]]; then
+            exit_abnormal "Invalid choice!"
+        fi
+
+        qualified_name=`find $install_path/*$name* -maxdepth 0 -execdir basename '{}' ';' | sed -n "$chosen_number p"`
+
+    fi
+	
+    if [[ -z $qualified_name ]]; then
+        exit_abnormal "Could not specify the qualified name!"
+    fi
+}
+
 # get terminal inputs
 
-while getopts ":ul:f:e:p:r:i:j:n:c:h" flag
-do
-    case "${flag}" in
-        u) uninstall="true";;
-        l) url=${OPTARG};;
-        n) name=${OPTARG};;
-        f) filename=${OPTARG};;
-        c) config_param=${OPTARG};;
-        e) ext=${OPTARG};;
-        p) package_path=${OPTARG};;
-        r) export_root=${OPTARG};;
-        i) install_path=${OPTARG};;
-        j) cores=${OPTARG};;
-        h) usage; exit 0;;
+while [ $# -gt 0 ]; do
+    case "$1" in
+    --install)
+        operation="install"
+        ;;
+    --uninstall)
+        operation="uninstall"
+        ;;
+    --hide)
+        operation="hide"
+        ;;
+    --unhide)
+        operation="unhide"
+        ;;
+    --url=*)
+        url="${1#*=}"
+        ;;
+    --file=*)
+        file="${1#*=}"
+        ;;
+    --cores=*)
+        cores="${1#*=}"
+        ;;
+    --config-params=*|--config-params=*)
+        config_params="${1#*=}"
+        ;;
+    --name=*)
+        name="${1#*=}"
+        ;;
+    --executable=*)
+        executable="${1#*=}"
+        ;;
+    --help|-h)
+        usage
+        exit 0
+        ;;
+    *)
+        exit_abnormal "Wrong usage!";
     esac
+    shift
 done
+
+# check the package management paths to exist and be valid
 
 if [[ $package_path != /* || $install_path != /* || $export_root != /* ]]; then
     exit_abnormal "Please provide the absolute paths."    
 fi
 if [[ ! -d $package_path || ! -d $export_root || ! -d $install_path ]]; then
-    exit_abnormal "Please run init_syminst.sh first to create the necessary directories."
+    exit_abnormal "Please run setup.sh first to create the necessary directories."
 fi
 
-# infer the filename from the url or the name
+# perform one of the operations "install", "uninstall", "hide", "unhide" as specified by the user
 
-if [[ -z $filename && ! -z $url ]]; then    # get filename from url
-    filename=`echo $url | rev | cut -d '/' -f1 | rev`
-elif [[ -z $filename && ! -z $name ]]; then     # get filename from name
-    filename="$name"."$ext"
-elif [[ -z $name && -z $filename ]]; then
-    exit_abnormal "Empty name and filename!"
-fi
-
-
-# perform install / uninstall
-
-if [ $uninstall == "false" ]; then
+if [[ $operation == "install" ]]; then
 
     pushd $package_path
-    if [ ! -z "$url" ]; then
+
+    # infer the filename from the url
+    if [[ -z $file && ! -z $url ]]; then
+        #file=`echo $url | rev | cut -d '/' -f1 | rev`
+        file=`basename $url`
+    elif [[ -z $file && -z $url ]]; then
+        exit_abnormal "Please provide a filename or a URL to fetch the source code!"
+    fi
+
+    if [[ ! -z "$url" && ! -f $file ]]; then
         wget $url
     fi
-    name=`tar -tf $filename | head -1 | cut -f1 -d'/'`
 
-    if [ ! -f $filenamme]; then
-        popd
-        exit_abnormal "Could not find file $filename under $package_path"
+    if [[ ! -f $file ]]; then
+        exit_abnormal "Could not find file $file under $package_path"
     fi
 
-    tar -xf $filename
+    foldername=`tar -tf $file | head -1 | cut -f1 -d'/'`
+
+    tar -xf $file
     
-    if [ ! -d $name ]; then
-        popd
-        exit_abnormal "Could not find directory $name under $package_path"
+    if [[ ! -d $foldername ]]; then
+        exit_abnormal "Could not find directory $foldername under $package_path"
     fi
 
-    pushd $name
+    pushd $foldername
 
     if [[ ! -f configure && -f autogen.sh ]]; then
         ./autogen.sh
         status=$?
         if test ! $status -eq 0; then
-            popd
-            popd
             exit_abnormal "Unsuccessful autogen.sh!"
         fi
     fi
 
     configured="false"
     if [[ ! -f configure && ! -f Makefile ]]; then
-        popd
-        popd
         exit_abnormal "Makefile and configure not found!"
     elif [[ -f configure ]]; then
-        ./configure --prefix=$export_root/usr $config_param
+        ./configure --prefix=$export_root/usr $config_params
         status=$?
         if test ! $status -eq 0; then
-            popd
-            popd
             exit_abnormal "Unsuccessful configure!"
         fi
         configured="true"
@@ -130,45 +215,54 @@ if [ $uninstall == "false" ]; then
     make -j$cores
     status=$?
     if test ! $status -eq 0; then
-        popd
-        popd
         exit_abnormal "Unsuccessful make!"
     fi
 
-    mkdir $install_path/$name
-    make DESTDIR=$install_path/$name install
+    mkdir $install_path/$foldername
+    make DESTDIR=$install_path/$foldername install
     status=$?
     if test ! $status -eq 0; then
-        popd
-        popd
         exit_abnormal "Unsuccessful make install!"
     fi
 
     
-    if [ $configured == "true" ]; then
-        cp -srv $install_path/"$name"$export_root/usr $export_root
+    if [[ $configured == "true" ]]; then
+        cp -srv $install_path/"$foldername"$export_root/usr $export_root
     else
-        cp -srv $install_path/$name/* $export_root/
+        cp -srv $install_path/"$foldername"/* $export_root/
     fi
 
     popd
-    rm -rf $name
+    rm -rf $foldername
     popd
 
-    echo "Package $name is symlink-installed under: $export_root"
-    echo "The regular installation files can be found under: $install_path/$name"
+    echo "Package $foldername is symlink-installed under: $export_root"
+    echo "The regular installation files can be found under: $install_path/$foldername"
 
-elif [ $uninstall == "true" ]; then
+elif [[ $operation == "uninstall" ]]; then
 
-    if [[ -z $name && ! -z $filename ]]; then
-        name=`tar -tf $filename | head -1 | cut -f1 -d'/'`
+    get_qualified_name
+    find $export_root -lname "$install_path/$qualified_name*" -delete
+    rm -rf $install_path/$qualified_name
+    echo "Package $qualified_name has been removed!"
+
+elif [[ $operation == "hide" ]]; then
+
+    get_qualified_name
+    echo "clearing "$export_root " from symlinks to "$install_path/$qualified_name
+    find $export_root -lname "$install_path/$qualified_name*" -delete
+    echo "The package \"$qualified_name\" has been hidden!"
+
+elif [[ $operation == "unhide" ]]; then
+
+    get_qualified_name
+    if [[ -d $install_path/"$qualified_name"$export_root/usr ]]; then   # configured install was performed
+        cp -srv $install_path/"$qualified_name"$export_root/usr $export_root 
+    elif [[ -d $install_path/"$qualified_name" ]]; then
+        cp -srv $install_path/"$qualified_name"/* $export_root/ 
+    else
+        exit_abnormal "Could not find the package to unhide!"
     fi
-    find $export_root -lname "$install_path/$name*" -delete
-    rm -rf $install_path/$name
-#    pushd $package_path
-#    find $package_path -name $filename -delete
-#    popd
-    echo "Package $name has been removed!"
 
 fi
 

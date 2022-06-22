@@ -23,7 +23,7 @@ cores=`cat /proc/cpuinfo | grep processor | wc -l`
 installer=symin
 
 usage() {                                 # Function: Print a help message.
-    echo "Usage: $0 [ -p package_path ] [ -r export_root ] [ -i install_path ] [ -j cores ] [ -s installer_path ]" 1>&2 
+    echo "Usage: source $0 [ -p package_path ] [ -r export_root ] [ -i install_path ] [ -j cores ] [ -s installer_path ]" 1>&2 
 }
 exit_abnormal() {                         # Function: Exit with error.
     echo "Error:" 1>&2
