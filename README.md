@@ -23,6 +23,10 @@ Notice that **symin** only supports GNU build system installations (`./configure
 
 ## Setup
 
+To setup **symin** you can simply run `source setup`. 
+
+More options of the setup script for special cases:
+
 `Usage: source setup.sh [ -p package_path ] [ -r export_root ] [ -i install_path ] [ -j cores ] [ -s installer_path ]`
 
 You are good to go with the defaults and just performing `source setup.sh`. All flags are optional and `setup.sh` can be invoked without defining any flags. In the case of having specific requirements, please first refer to the section *Package Management* bellow to understand the setup parameters. The following flags can be adjusted to match with more specific usages. 
