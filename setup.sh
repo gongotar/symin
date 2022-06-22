@@ -56,9 +56,9 @@ if test ! $status -eq 0; then
     exit_abnormal "Could not create the necessary directories. please check the permissions."
 fi
 
-path_export="export PATH=\$PATH:$export_root/usr/bin:$export_root/usr/sbin:$export_root/usr/local/bin"
-lib_export="export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:$export_root/usr/lib:$export_root/usr/lib64"
-pkgconfig_export="export PKG_CONFIG_PATH=\${PKG_CONFIG_PATH}:$export_root/usr/lib/pkgconfig:$export_root/usr/lib64/pkgconfig"
+path_export="export PATH=$export_root/usr/bin:$export_root/usr/sbin:$export_root/usr/local/bin:\$PATH"
+lib_export="export LD_LIBRARY_PATH=$export_root/usr/lib:$export_root/usr/lib64:\$LD_LIBRARY_PATH"
+pkgconfig_export="export PKG_CONFIG_PATH=$export_root/usr/lib/pkgconfig:$export_root/usr/lib64/pkgconfig:\${PKG_CONFIG_PATH}"
 
 if [ ! -f $HOME/.bashrc ]; then
     touch $HOME/.bashrc
