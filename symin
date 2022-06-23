@@ -85,8 +85,6 @@ get_filename() {                # Function: get the already downloaded filename 
 
     file=`find $package_path -maxdepth 1 -iname "*$name*" -execdir basename '{}' ';' | sed -n "$chosen_number p"`
 
-    fi
-	
     if [[ -z $file ]]; then
         exit_abnormal "Could not find the file!"
     fi
