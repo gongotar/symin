@@ -208,7 +208,7 @@ if [[ $operation == "install" ]]; then
     if [[ -z $file && ! -z $url ]]; then
         #file=`echo $url | rev | cut -d '/' -f1 | rev`
         file=`basename $url`
-    elif [[ ! -z $name && ! z $url ]]; then
+    elif [[ ! -z $name && ! -z $url ]]; then
         
     elif [[ -z $file && -z $url ]]; then
         exit_abnormal "Please provide a filename or a URL to fetch the source code!"
