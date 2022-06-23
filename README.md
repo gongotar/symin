@@ -60,6 +60,7 @@ Supported operations are:
 installs a package.<br>
   - to install a package, one of the following parameters must be set:<br>
     - *url*: the URL to download the package.<br>
+    - *name*: the name (or a part of the name) of an already downloaded package (e.g., when a package is installed and then uninstalled, its archive file is kept).
     - *file*: the archive file of the package (locally available).<br>
   - optional parameters to install a package are as follows:<br>
     - *config-params* *(optional)*: parameters that to be passed to the `./configure` script.<br>
