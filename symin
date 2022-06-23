@@ -68,19 +68,19 @@ get_qualified_name() {			# Function: get the qualified name, either by following
 
     else                                # get the qualified name from the user (for uninstall, hide, and unhide)
 
-        candidates_number=`find $install_path/*$name* -maxdepth 0 | wc -l`
+        candidates_number=`find $install_path -maxdepth 1 -iname "*$name*" | wc -l`
         chosen_number=-1
 
         if [[ $candidates_number -gt 1 ]]; then
 
             echo "Following installations are found:"
-            find $install_path/*$name* -maxdepth 0 -execdir basename '{}' ';' | nl
+            find $install_path -maxdepth 1 -iname "*$name*" -execdir basename '{}' ';' | nl
             read -p "Enter the number of the package: " chosen_number
 
         elif [[ $candidates_number -eq 1 ]]; then
 
             echo "Following installation is found:"
-            find $install_path/*$name* -maxdepth 0 -execdir bash -c "printf '\t'; basename '{}'" ';'
+            find $install_path -maxdepth 1 -iname "*$name*" -execdir bash -c "printf '\t'; basename '{}'" ';'
             read -p "Did you mean this package? (Y|n): " y_n
             if [[ $y_n == "Y" || $y_n == "y" ]]; then
                 chosen_number=1
@@ -97,7 +97,7 @@ get_qualified_name() {			# Function: get the qualified name, either by following
             exit_abnormal "Invalid choice!"
         fi
 
-        qualified_name=`find $install_path/*$name* -maxdepth 0 -execdir basename '{}' ';' | sed -n "$chosen_number p"`
+        qualified_name=`find $install_path -maxdepth 1 -iname "*$name*" -execdir basename '{}' ';' | sed -n "$chosen_number p"`
 
     fi
 	
