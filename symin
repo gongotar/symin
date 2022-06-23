@@ -52,6 +52,47 @@ exit_abnormal() {                     	# Function: Exit with error.
     exit 1
 }
 
+get_filename() {                # Function: get the already downloaded filename using the provided --name by the user
+
+    candidates_number=`find $package_path -maxdepth 1 -iname "*$name*" | wc -l`
+    chosen_number=-1
+
+    if [[ $candidates_number -gt 1 ]]; then
+
+        echo "Following downloaded packages are found:"
+        find $package_path -maxdepth 1 -iname "*$name*" -execdir basename '{}' ';' | nl
+        read -p "Enter the number of the package: " chosen_number
+
+    elif [[ $candidates_number -eq 1 ]]; then
+
+        echo "Following downloaded package is found:"
+        find $package_path -maxdepth 1 -iname "*$name*" -execdir bash -c "printf '\t'; basename '{}'" ';'
+        read -p "Did you mean this package? (Y|n): " y_n
+        if [[ $y_n == "Y" || $y_n == "y" ]]; then
+            chosen_number=1
+        else
+            echo "Operation aborted!"
+            exit 0
+        fi
+
+    else
+        exit_abnormal "Could not find any packages regarding the input name!"
+    fi
+
+    if [[ $chosen_number -lt 1 || $chosen_number -gt $candidates_number ]]; then
+        exit_abnormal "Invalid choice!"
+    fi
+
+    file=`find $package_path -maxdepth 1 -iname "*$name*" -execdir basename '{}' ';' | sed -n "$chosen_number p"`
+
+    fi
+	
+    if [[ -z $file ]]; then
+        exit_abnormal "Could not find the file!"
+    fi
+
+}
+
 get_qualified_name() {			# Function: get the qualified name, either by following the executable symlink, or by prompting the user
     
 
@@ -93,7 +134,7 @@ get_qualified_name() {			# Function: get the qualified name, either by following
             exit_abnormal "Could not find any packages regarding the input name!"
         fi
 
-        if [[ $chosen_number -lt 1 ]]; then
+        if [[ $chosen_number -lt 1 || $chosen_number -gt $candidates_number ]]; then
             exit_abnormal "Invalid choice!"
         fi
 
@@ -169,6 +210,8 @@ if [[ $operation == "install" ]]; then
     if [[ -z $file && ! -z $url ]]; then
         #file=`echo $url | rev | cut -d '/' -f1 | rev`
         file=`basename $url`
+    elif [[ ! -z $name && ! z $url ]]; then
+        
     elif [[ -z $file && -z $url ]]; then
         exit_abnormal "Please provide a filename or a URL to fetch the source code!"
     fi
