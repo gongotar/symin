@@ -36,7 +36,7 @@ You are good to go with the defaults and just performing `source setup.sh`. All 
 - `-s <installer_path>`: the path to the `symin` script.
 
 
-## Using Symin
+## Using symin
 
 ```bash
 Usage: symin
