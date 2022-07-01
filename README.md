@@ -13,9 +13,10 @@ Here you find some sample usages of `symin` to install, uninstall, hide (making 
 symin --url=https://ftp.gnu.org/gnu/bc/bc-1.07.tar.gz               # install from the URL (archive will be downloaded)
 symin --file=bc-1.07.tar.gz                                         # install from the archive file (archive file should be available)
 symin --file=gnuplot-5.4.2.tar.gz --config-params="--with-cairo"    # install from the archive and setting the configure parameters
+symin --uninstall --name=neovim                                     # uninstall the neovim application (program identified by a part of its name)
 symin --uninstall --executable=gnuplot                              # uninstall the gnuplot program (program identified by its executable)
 symin --hide --name=python                                          # hides python3 without actually uninstalling it
-symin --unhide --name=python                                        # undo hide a hidden application by its qualified name  
+symin --unhide --name=python                                        # undo hide a hidden application by (a part of) its name  
 ```
 
 Notice that **symin** only supports GNU build system installations (`./configure & make & make install`) with the optional configure command. If necessary, `autogen.sh` is performed before `./configure`.
@@ -34,7 +35,8 @@ You are good to go with the defaults and just performing `source setup.sh`. All 
 - `-j <cores>`: the number of cores for `make`. This is automatically detected if not specified.
 - `-s <installer_path>`: the path to the `symin` script.
 
-## Manual
+
+## Using Symin
 
 ```bash
 Usage: symin
@@ -60,7 +62,7 @@ Supported operations are:
 installs a package.<br>
   - to install a package, one of the following parameters must be set:<br>
     - *url*: the URL to download the package.<br>
-    - *name*: the name (or a part of the name) of an already downloaded package (e.g., when a package is installed and then uninstalled, its archive file is kept).
+    - *name*: the name (or a part of the name) of an already downloaded package (e.g., when a package is installed and then uninstalled, its archive file is kept). If more than one packages match with the name, the user will choose between the matching candidates.
     - *file*: the archive file of the package (locally available).<br>
   - optional parameters to install a package are as follows:<br>
     - *config-params* *(optional)*: parameters that to be passed to the `./configure` script.<br>
