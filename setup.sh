@@ -58,6 +58,9 @@ fi
 
 path_export="export PATH=$export_root/usr/bin:$export_root/usr/sbin:$export_root/usr/local/bin:\$PATH"
 lib_export="export LD_LIBRARY_PATH=$export_root/usr/lib:$export_root/usr/lib64:\$LD_LIBRARY_PATH"
+c_include_export="export C_INCLUDE_PATH=$export_root/usr/include:$export_root/usr/local/include:\$C_INCLUDE_PATH"
+cpp_include_export="export CPLUS_INCLUDE_PATH=$export_root/usr/include:$export_root/usr/local/include:\$CPLUS_INCLUDE_PATH"
+cpath_export="export CPATH=$export_root/usr/include:$export_root/usr/local/include:\$CPATH"
 pkgconfig_export="export PKG_CONFIG_PATH=$export_root/usr/lib/pkgconfig:$export_root/usr/lib64/pkgconfig:\${PKG_CONFIG_PATH}"
 
 if [ ! -f $HOME/.bashrc ]; then
@@ -69,6 +72,15 @@ if ! grep -q "$path_export" $HOME/.bashrc; then
 fi
 if ! grep -q "$lib_export" $HOME/.bashrc; then
     echo $lib_export >> $HOME/.bashrc
+fi
+if ! grep -q "$c_include_export" $HOME/.bashrc; then
+    echo $c_include_export >> $HOME/.bashrc
+fi
+if ! grep -q "$cpp_include_export" $HOME/.bashrc; then
+    echo $cpp_include_export >> $HOME/.bashrc
+fi
+if ! grep -q "$cpath_export" $HOME/.bashrc; then
+    echo $cpath_export >> $HOME/.bashrc
 fi
 if ! grep -q "$pkgconfig_export" $HOME/.bashrc; then
     echo $pkgconfig_export >> $HOME/.bashrc
