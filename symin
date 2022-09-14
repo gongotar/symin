@@ -26,6 +26,8 @@ cores=4
 
 operation="install" 		# the default operation is to install the package
 config_params=""		# no configure parameters by default other than "--prefix" that is used for package management.
+list_before="0"
+list_after="0"
 
 # define functions
 
@@ -160,6 +162,25 @@ while [ $# -gt 0 ]; do
         ;;
     --unhide)
         operation="unhide"
+        ;;
+    --list)
+        operation="list"
+        ;;
+    --before)
+        list_before="4"
+	operation="list"
+        ;;
+    --after)
+        list_after="4"
+	operation="list"
+        ;;
+    --before=*)
+        list_before="${1#*=}"
+	operation="list"
+        ;;
+    --after=*)
+        list_after="${1#*=}"
+	operation="list"
         ;;
     --url=*)
         url="${1#*=}"
@@ -305,5 +326,16 @@ elif [[ $operation == "unhide" ]]; then
         exit_abnormal "Could not find the package to unhide!"
     fi
 
+elif [[ $operation == "list" ]]; then 
+    if  [[ ! -z $name ]]; then
+    	get_qualified_name
+    	echo "Following packages are installed before/after installing "$qualified_name":"
+	ls -lt $install_path | grep "$qualified_name" -B "$list_before" -A "$list_after" | awk '{print "\t",$6,$7,$8,$9;}'
+    else
+    	echo "Installed packages:"
+    	ls -lt $install_path | awk '{print "\t",$6,$7,$8,$9;}'
+    fi
+
 fi
+
 
