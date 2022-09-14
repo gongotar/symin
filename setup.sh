@@ -16,10 +16,10 @@
 
 # default values
 
-package_path=$HOME/.apps/packages
-install_path=$HOME/.apps/installs
-export_root=$HOME/.apps/root
-cores=`cat /proc/cpuinfo | grep processor | wc -l`
+symin_package_path=$HOME/.apps/packages
+symin_install_path=$HOME/.apps/installs
+symin_export_root=$HOME/.apps/root
+symin_cores=`cat /proc/cpuinfo | grep processor | wc -l`
 installer=symin
 
 usage() {                                 # Function: Print a help message.
@@ -37,34 +37,57 @@ exit_abnormal() {                         # Function: Exit with error.
 while getopts ":p:r:i:j:h" flag
 do
     case "${flag}" in
-        p) package_path=${OPTARG};;
-        r) export_root=${OPTARG};;
-        i) install_path=${OPTARG};;
-        j) cores=${OPTARG};;
+        p) symin_package_path=${OPTARG};;
+        r) symin_export_root=${OPTARG};;
+        i) symin_install_path=${OPTARG};;
+        j) symin_cores=${OPTARG};;
         s) installer=${OPTARG};;
         h) usage; exit 0;;
     esac
 done
 
-if [[ $package_path != /* || $install_path != /* || $export_root != /* ]]; then
+if [[ $symin_package_path != /* || $symin_install_path != /* || $symin_export_root != /* ]]; then
     exit_abnormal "Please provide the absolute paths."    
 fi
 
-mkdir -p $package_path $install_path $export_root/usr/bin
+mkdir -p $symin_package_path $symin_install_path $symin_export_root/usr/bin
 status=$?
 if test ! $status -eq 0; then
     exit_abnormal "Could not create the necessary directories. please check the permissions."
 fi
 
-path_export="export PATH=$export_root/usr/bin:$export_root/usr/sbin:$export_root/usr/local/bin:\$PATH"
-lib_export="export LD_LIBRARY_PATH=$export_root/usr/lib:$export_root/usr/lib64:\$LD_LIBRARY_PATH"
-c_include_export="export C_INCLUDE_PATH=$export_root/usr/include:$export_root/usr/local/include:\$C_INCLUDE_PATH"
-cpp_include_export="export CPLUS_INCLUDE_PATH=$export_root/usr/include:$export_root/usr/local/include:\$CPLUS_INCLUDE_PATH"
-cpath_export="export CPATH=$export_root/usr/include:$export_root/usr/local/include:\$CPATH"
-pkgconfig_export="export PKG_CONFIG_PATH=$export_root/usr/lib/pkgconfig:$export_root/usr/lib64/pkgconfig:\${PKG_CONFIG_PATH}"
+symin_package_path_export="export symin_package_path=$symin_package_path"
+symin_install_path_export="export symin_install_path=$symin_install_path"
+symin_export_root_export="export symin_export_root=$symin_export_root"
+symin_cores_export="export symin_cores=$symin_cores"
+
+path_export="export PATH=$symin_export_root/usr/bin:$symin_export_root/usr/sbin:$symin_export_root/usr/local/bin:\$PATH"
+lib_export="export LD_LIBRARY_PATH=$symin_export_root/usr/lib:$symin_export_root/usr/lib64:\$LD_LIBRARY_PATH"
+c_include_export="export C_INCLUDE_PATH=$symin_export_root/usr/include:$symin_export_root/usr/local/include:\$C_INCLUDE_PATH"
+cpp_include_export="export CPLUS_INCLUDE_PATH=$symin_export_root/usr/include:$symin_export_root/usr/local/include:\$CPLUS_INCLUDE_PATH"
+cpath_export="export CPATH=$symin_export_root/usr/include:$symin_export_root/usr/local/include:\$CPATH"
+pkgconfig_export="export PKG_CONFIG_PATH=$symin_export_root/usr/lib/pkgconfig:$symin_export_root/usr/lib64/pkgconfig:\${PKG_CONFIG_PATH}"
 
 if [ ! -f $HOME/.bashrc ]; then
     touch $HOME/.bashrc
+fi
+
+sed -i "s|^\s*export symin_package_path=.*||g" $HOME/.bashrc
+sed -i "s|^\s*export symin_install_path=.*||g" $HOME/.bashrc
+sed -i "s|^\s*export symin_export_root=.*||g" $HOME/.bashrc
+sed -i "s|^\s*export symin_cores=.*||g" $HOME/.bashrc
+
+if ! grep -q "$symin_package_path_export" $HOME/.bashrc; then
+    echo $symin_package_path_export >> $HOME/.bashrc
+fi
+if ! grep -q "$symin_install_path_export" $HOME/.bashrc; then
+    echo $symin_install_path_export >> $HOME/.bashrc
+fi
+if ! grep -q "$symin_export_root_export" $HOME/.bashrc; then
+    echo $symin_export_root_export >> $HOME/.bashrc
+fi
+if ! grep -q "$symin_cores_export" $HOME/.bashrc; then
+    echo $symin_cores_export >> $HOME/.bashrc
 fi
 
 if ! grep -q "$path_export" $HOME/.bashrc; then
@@ -86,13 +109,13 @@ if ! grep -q "$pkgconfig_export" $HOME/.bashrc; then
     echo $pkgconfig_export >> $HOME/.bashrc
 fi
 
-installer_new_path=$export_root/usr/bin/symin
+installer_new_path=$symin_export_root/usr/bin/symin
 
 cp $installer $installer_new_path
 
-sed -i "s|^\s*package_path=.*|package_path=$package_path|g" $installer_new_path
-sed -i "s|^\s*install_path=.*|install_path=$install_path|g" $installer_new_path
-sed -i "s|^\s*export_root=.*|export_root=$export_root|g" $installer_new_path
-sed -i "s|^\s*cores=.*|cores=$cores|g" $installer_new_path
+#sed -i "s|^\s*symin_package_path=.*|symin_package_path=$symin_package_path|g" $installer_new_path
+#sed -i "s|^\s*symin_install_path=.*|symin_install_path=$symin_install_path|g" $installer_new_path
+#sed -i "s|^\s*symin_export_root=.*|symin_export_root=$symin_export_root|g" $installer_new_path
+#sed -i "s|^\s*symin_cores=.*|symin_cores=$symin_cores|g" $installer_new_path
 
 source $HOME/.bashrc

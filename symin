@@ -17,13 +17,13 @@
 
 # variables to be configured at setup
 
-package_path=/home/username/.apps/packages
-install_path=/home/username/.apps/installs
-export_root=/home/username/.apps/root
-cores=4
+#symin_package_path=/home/username/.apps/packages
+#symin_install_path=/home/username/.apps/installs
+#symin_export_root=/home/username/.apps/root
 
 # init default variables
 
+cores=$symin_cores
 operation="install" 		# the default operation is to install the package
 config_params=""		# no configure parameters by default other than "--prefix" that is used for package management.
 list_before="0"
@@ -56,19 +56,19 @@ exit_abnormal() {                     	# Function: Exit with error.
 
 get_filename() {                # Function: get the already downloaded filename using the provided --name by the user
 
-    candidates_number=`find $package_path -maxdepth 1 -iname "*$name*" | wc -l`
+    candidates_number=`find $symin_package_path -maxdepth 1 -iname "*$name*" | wc -l`
     chosen_number=-1
 
     if [[ $candidates_number -gt 1 ]]; then
 
         echo "Following downloaded packages are found:"
-        find $package_path -maxdepth 1 -iname "*$name*" -execdir basename '{}' ';' | nl
+        find $symin_package_path -maxdepth 1 -iname "*$name*" -execdir basename '{}' ';' | nl
         read -p "Enter the number of the package: " chosen_number
 
     elif [[ $candidates_number -eq 1 ]]; then
 
         echo "Following downloaded package is found:"
-        find $package_path -maxdepth 1 -iname "*$name*" -execdir bash -c "printf '\t'; basename '{}'" ';'
+        find $symin_package_path -maxdepth 1 -iname "*$name*" -execdir bash -c "printf '\t'; basename '{}'" ';'
         read -p "Did you mean this package? (Y|n): " y_n
         if [[ $y_n == "Y" || $y_n == "y" ]]; then
             chosen_number=1
@@ -85,7 +85,7 @@ get_filename() {                # Function: get the already downloaded filename 
         exit_abnormal "Invalid choice!"
     fi
 
-    file=`find $package_path -maxdepth 1 -iname "*$name*" -execdir basename '{}' ';' | sed -n "$chosen_number p"`
+    file=`find $symin_package_path -maxdepth 1 -iname "*$name*" -execdir basename '{}' ';' | sed -n "$chosen_number p"`
 
     if [[ -z $file ]]; then
         exit_abnormal "Could not find the file!"
@@ -99,29 +99,29 @@ get_qualified_name() {			# Function: get the qualified name, either by following
     if [[ ! -z $executable ]]; then     # get the qualified name by following the program executable symlink (for uninstall and hide)
 
         symlink_name=`readlink $(which $executable)`
-        install_len=${#install_path}
+        install_len=${#symin_install_path}
         path_base=${symlink_name:0:$install_len}
-        if [[ $path_base != $install_path ]]; then
-            exit_abnormal "The install directory $path_base is not the same directory of the symin installation path $install_path."
+        if [[ $path_base != $symin_install_path ]]; then
+            exit_abnormal "The install directory $path_base is not the same directory of the symin installation path $symin_install_path."
         fi
         path_rest=${symlink_name:$install_len+1}
         qualified_name=`echo $path_rest | cut -f1 -d'/'`
 
     else                                # get the qualified name from the user (for uninstall, hide, and unhide)
 
-        candidates_number=`find $install_path -maxdepth 1 -iname "*$name*" | wc -l`
+        candidates_number=`find $symin_install_path -maxdepth 1 -iname "*$name*" | wc -l`
         chosen_number=-1
 
         if [[ $candidates_number -gt 1 ]]; then
 
             echo "Following installations are found:"
-            find $install_path -maxdepth 1 -iname "*$name*" -execdir basename '{}' ';' | nl
+            find $symin_install_path -maxdepth 1 -iname "*$name*" -execdir basename '{}' ';' | nl
             read -p "Enter the number of the package: " chosen_number
 
         elif [[ $candidates_number -eq 1 ]]; then
 
             echo "Following installation is found:"
-            find $install_path -maxdepth 1 -iname "*$name*" -execdir bash -c "printf '\t'; basename '{}'" ';'
+            find $symin_install_path -maxdepth 1 -iname "*$name*" -execdir bash -c "printf '\t'; basename '{}'" ';'
             read -p "Did you mean this package? (Y|n): " y_n
             if [[ $y_n == "Y" || $y_n == "y" ]]; then
                 chosen_number=1
@@ -138,7 +138,7 @@ get_qualified_name() {			# Function: get the qualified name, either by following
             exit_abnormal "Invalid choice!"
         fi
 
-        qualified_name=`find $install_path -maxdepth 1 -iname "*$name*" -execdir basename '{}' ';' | sed -n "$chosen_number p"`
+        qualified_name=`find $symin_install_path -maxdepth 1 -iname "*$name*" -execdir basename '{}' ';' | sed -n "$chosen_number p"`
 
     fi
 	
@@ -212,10 +212,10 @@ done
 
 # check the package management paths to exist and be valid
 
-if [[ $package_path != /* || $install_path != /* || $export_root != /* ]]; then
+if [[ $symin_package_path != /* || $symin_install_path != /* || $symin_export_root != /* ]]; then
     exit_abnormal "Please provide the absolute paths."    
 fi
-if [[ ! -d $package_path || ! -d $export_root || ! -d $install_path ]]; then
+if [[ ! -d $symin_package_path || ! -d $symin_export_root || ! -d $symin_install_path ]]; then
     exit_abnormal "Please run setup.sh first to create the necessary directories."
 fi
 
@@ -223,7 +223,7 @@ fi
 
 if [[ $operation == "install" ]]; then
 
-    pushd $package_path
+    pushd $symin_package_path
 
     # infer the filename from the url
     if [[ -z $file && ! -z $url ]]; then
@@ -240,7 +240,7 @@ if [[ $operation == "install" ]]; then
     fi
 
     if [[ ! -f $file ]]; then
-        exit_abnormal "Could not find file $file under $package_path"
+        exit_abnormal "Could not find file $file under $symin_package_path"
     fi
 
     foldername=`tar -tf $file | head -1 | cut -f1 -d'/'`
@@ -248,7 +248,7 @@ if [[ $operation == "install" ]]; then
     tar -xf $file
     
     if [[ ! -d $foldername ]]; then
-        exit_abnormal "Could not find directory $foldername under $package_path"
+        exit_abnormal "Could not find directory $foldername under $symin_package_path"
     fi
 
     pushd $foldername
@@ -265,7 +265,7 @@ if [[ $operation == "install" ]]; then
     if [[ ! -f configure && ! -f Makefile ]]; then
         exit_abnormal "Makefile and configure not found!"
     elif [[ -f configure ]]; then
-        ./configure --prefix=$export_root/usr $config_params
+        ./configure --prefix=$symin_export_root/usr $config_params
         status=$?
         if test ! $status -eq 0; then
             exit_abnormal "Unsuccessful configure!"
@@ -280,8 +280,8 @@ if [[ $operation == "install" ]]; then
         exit_abnormal "Unsuccessful make!"
     fi
 
-    mkdir $install_path/$foldername
-    make DESTDIR=$install_path/$foldername install
+    mkdir $symin_install_path/$foldername
+    make DESTDIR=$symin_install_path/$foldername install
     status=$?
     if test ! $status -eq 0; then
         exit_abnormal "Unsuccessful make install!"
@@ -289,39 +289,39 @@ if [[ $operation == "install" ]]; then
 
     
     if [[ $configured == "true" ]]; then
-        cp -srv $install_path/"$foldername"$export_root/usr $export_root
+        cp -srv $symin_install_path/"$foldername"$symin_export_root/usr $symin_export_root
     else
-        cp -srv $install_path/"$foldername"/* $export_root/
+        cp -srv $symin_install_path/"$foldername"/* $symin_export_root/
     fi
 
     popd
     rm -rf $foldername
     popd
 
-    echo "Package $foldername is symlink-installed under: $export_root"
-    echo "The regular installation files can be found under: $install_path/$foldername"
+    echo "Package $foldername is symlink-installed under: $symin_export_root"
+    echo "The regular installation files can be found under: $symin_install_path/$foldername"
 
 elif [[ $operation == "uninstall" ]]; then
 
     get_qualified_name
-    find $export_root -lname "$install_path/$qualified_name*" -delete
-    rm -rf $install_path/$qualified_name
+    find $symin_export_root -lname "$symin_install_path/$qualified_name*" -delete
+    rm -rf $symin_install_path/$qualified_name
     echo "Package $qualified_name has been removed!"
 
 elif [[ $operation == "hide" ]]; then
 
     get_qualified_name
-    echo "clearing "$export_root " from symlinks to "$install_path/$qualified_name
-    find $export_root -lname "$install_path/$qualified_name*" -delete
+    echo "clearing "$symin_export_root " from symlinks to "$symin_install_path/$qualified_name
+    find $symin_export_root -lname "$symin_install_path/$qualified_name*" -delete
     echo "The package \"$qualified_name\" has been hidden!"
 
 elif [[ $operation == "unhide" ]]; then
 
     get_qualified_name
-    if [[ -d $install_path/"$qualified_name"$export_root/usr ]]; then   # configured install was performed
-        cp -srv $install_path/"$qualified_name"$export_root/usr $export_root 
-    elif [[ -d $install_path/"$qualified_name" ]]; then
-        cp -srv $install_path/"$qualified_name"/* $export_root/ 
+    if [[ -d $symin_install_path/"$qualified_name"$symin_export_root/usr ]]; then   # configured install was performed
+        cp -srv $symin_install_path/"$qualified_name"$symin_export_root/usr $symin_export_root 
+    elif [[ -d $symin_install_path/"$qualified_name" ]]; then
+        cp -srv $symin_install_path/"$qualified_name"/* $symin_export_root/ 
     else
         exit_abnormal "Could not find the package to unhide!"
     fi
@@ -329,12 +329,18 @@ elif [[ $operation == "unhide" ]]; then
 elif [[ $operation == "list" ]]; then 
     if  [[ ! -z $name ]]; then
     	get_qualified_name
-    	echo "Following packages are installed before/after installing "$qualified_name":"
-	ls -lt $install_path | grep "$qualified_name" -B "$list_before" -A "$list_after" | awk '{print "\t",$6,$7,$8,$9;}'
+	if [[ $list_before == "0" && $list_after == "0" ]]; then
+		echo "Installed package:"
+	else
+    		echo "Following packages are installed before/after installing "$qualified_name":"
+	fi
+	echo ""
+	ls -lt $symin_install_path | grep "$qualified_name" -B "$list_before" -A "$list_after" | awk '{print "\t",$6,$7,$8,$9;}'
     else
     	echo "Installed packages:"
-    	ls -lt $install_path | awk '{print "\t",$6,$7,$8,$9;}'
+    	ls -lt $symin_install_path | awk '{print "\t",$6,$7,$8,$9;}'
     fi
+    echo ""
 
 fi
 
